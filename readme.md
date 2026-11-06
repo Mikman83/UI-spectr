@@ -746,3 +746,135 @@
 | DI-токены | 85 |
 | Константы | 163 |
 | Функции | 79 |
+
+## Пример использования: Button (SpectrButtonComponent)
+
+Кнопка реализована как директива-атрибут: селектор применяется к нативным элементам `button` и `a`.
+
+Поддерживаются четыре селектора:
+
+- `button[spectrButton]` — обычная кнопка;
+- `a[spectrButton]` — ссылка в стиле кнопки;
+- `button[spectrIconButton]` — иконка-кнопка;
+- `a[spectrIconButton]` — ссылка-иконка.
+
+### Подключение
+
+Компонент standalone — импортируйте его в `imports` вашего компонента:
+
+```ts
+import { Component } from '@angular/core';
+import { SpectrButtonComponent } from '@spectr-ui/components';
+
+@Component({
+  selector: 'app-example',
+  standalone: true,
+  imports: [SpectrButtonComponent],
+  templateUrl: './example.component.html',
+})
+export class ExampleComponent {}
+```
+
+При NgModule-подходе импортируйте соответствующий модуль из пакета.
+
+### Базовое использование
+
+```html
+<!-- Основная кнопка: параметры по умолчанию size='l', appearance='primary', appearanceType='fill' -->
+<button spectrButton>Отправить</button>
+
+<!-- С явными параметрами -->
+<button spectrButton appearance="primary" appearanceType="fill" size="l">
+  Сохранить
+</button>
+```
+
+### Кнопка-ссылка
+
+```html
+<a spectrButton appearance="secondary" href="/docs">Открыть документацию</a>
+```
+
+### Иконка-кнопка
+
+```html
+<!-- Имя иконки задаётся входом icon, набор иконок — @spectr-ui/icons -->
+<button spectrIconButton icon="settings" appearance="secondary"></button>
+```
+
+### Входные параметры (Inputs)
+
+| Параметр | Тип | По умолчанию | Описание |
+| --- | --- | --- | --- |
+| `size` | `'s' \| 'm' \| 'l'` | `'l'` | Размер кнопки |
+| `appearance` | строковый | `'primary'` | Вариант оформления (цветовая роль) |
+| `appearanceType` | строковый | `'fill'` | Тип оформления (заливка, контур и т. д.) |
+| `icon` | строковый | — | Имя иконки слева |
+| `iconRight` | строковый | — | Имя иконки справа |
+| `hasIndicator` | `boolean` | `false` | Показывать индикатор статуса |
+| `indicatorStatus` | строковый | — | Статус индикатора |
+| `indicatorOutlineColor` | строковый | — | Цвет обводки индикатора |
+| `disabled` | `boolean` | `false` | Блокирует нажатие |
+
+Значения по умолчанию задаются константой `SPECTR_BUTTON_DEFAULT_OPTIONS`:
+`{ size: 'l', appearance: 'primary', appearanceType: 'fill', hasIndicator: false, ... }`.
+
+Полный список допустимых значений `appearance` / `appearanceType` / `size` смотрите в типах
+пакета `@spectr-ui/components` (интерфейсы параметров кнопки в собранном бандле
+`spectr-ui-components.mjs`).
+
+### Обработка событий
+
+Кнопка рендерится как нативный элемент, поэтому клик обрабатывается стандартным способом:
+
+```ts
+export class ExampleComponent {
+  onSave(): void {
+    console.log('Данные сохранены');
+  }
+}
+```
+
+```html
+<button spectrButton appearance="primary" size="l" (click)="onSave()">
+  Сохранить изменения
+</button>
+```
+
+### Состояния
+
+```html
+<!-- Блокированная кнопка -->
+<button spectrButton [disabled]="true">Недоступно</button>
+
+<!-- Кнопка с индикатором статуса -->
+<button
+  spectrButton
+  [hasIndicator]="true"
+  [indicatorStatus]="status"
+>
+  Сохранение…
+</button>
+```
+
+### Глобальная настройка значений по умолчанию
+
+Пакет экспортирует фабрику `spectrButtonOptionsProvider`, которая переопределяет
+значения по умолчанию для всех кнопок приложения через токен `SPECTR_BUTTON_OPTIONS`:
+
+```ts
+import { spectrButtonOptionsProvider } from '@spectr-ui/components';
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    spectrButtonOptionsProvider({ size: 'm', appearance: 'secondary' }),
+  ],
+});
+```
+
+### Доступность и рекомендации
+
+- Всегда используйте нативные `button` и `a` с директивой, а не `div` с обработчиком клика.
+- Для иконок-кнопок добавляйте осмысленный текст или `aria-label`.
+- Если кнопка находится внутри формы и должна отправлять её, добавьте атрибут `type="submit"`;
+  для обычных действий укажите `type="button"`.
